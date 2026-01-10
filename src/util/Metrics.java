@@ -2,23 +2,27 @@ package util;
 
 public class Metrics {
 
-    private int totalVehiclesPassed;
-    private double totalWaitingTime;
-
-    public void addVehiclePassed() {
-        totalVehiclesPassed++;
-    }
+    private double totalWaitingTime = 0;
+    private int servedCars = 0;
 
     public void addWaitingTime(double time) {
         totalWaitingTime += time;
     }
 
-    public int getTotalVehiclesPassed() {
-        return totalVehiclesPassed;
+    public void incrementServedCars() {
+        servedCars++;
     }
 
     public double getAverageWaitingTime() {
-        if (totalVehiclesPassed == 0) return 0;
-        return totalWaitingTime / totalVehiclesPassed;
+        return servedCars == 0 ? 0 : totalWaitingTime / servedCars;
+    }
+
+    public int getServedCars() {
+        return servedCars;
+    }
+
+    public void reset() {
+        totalWaitingTime = 0;
+        servedCars = 0;
     }
 }
