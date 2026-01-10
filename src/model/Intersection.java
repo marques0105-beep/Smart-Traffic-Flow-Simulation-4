@@ -1,23 +1,17 @@
 package model;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class Intersection {
 
-    private String id;
-    private List<Road> roads;
+    private List<Road> roads = new ArrayList<>();
 
-    public Intersection(String id, List<Road> roads) {
-        this.id = id;
-        this.roads = roads;
-    }
-
-    public String getId() {
-        return id;
+    public void addRoad(Road road) {
+        roads.add(road);
     }
 
     public List<Road> getRoads() {
         return roads;
     }
 }
-
