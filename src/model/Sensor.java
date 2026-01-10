@@ -8,7 +8,11 @@ public class Sensor {
         this.road = road;
     }
 
-    public boolean hasCarsWaiting() {
-        return road.getQueueSize() > 0;
+    public int getWaitingCars() {
+        return road.getQueueSize();
+    }
+
+    public boolean hasEmergency() {
+        return road.hasEmergencyVehicle();
     }
 }
