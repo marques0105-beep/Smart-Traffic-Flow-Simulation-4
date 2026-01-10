@@ -1,27 +1,25 @@
 package controller;
 
-import model.Road;
+import model.Sensor;
 
 public class AdaptiveCycle implements Strategy {
 
-    private Road road;
+    private Sensor sensor;
 
-    public AdaptiveCycle(Road road) {
-        this.road = road;
+    public AdaptiveCycle(Sensor sensor) {
+        this.sensor = sensor;
     }
 
-    @Override
     public double getRedDuration() {
-        return 3 + road.getQueueSize() * 0.5;
+        return sensor.hasEmergency() ? 1 : 3;
     }
 
-    @Override
     public double getGreenDuration() {
-        return 3 + road.getQueueSize() * 0.3;
+        if (sensor.hasEmergency()) return 8;
+        return 3 + sensor.getWaitingCars() * 0.5;
     }
 
-    @Override
     public double getYellowDuration() {
-        return 2;
+        return 1;
     }
 }
