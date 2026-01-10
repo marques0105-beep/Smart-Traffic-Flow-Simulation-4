@@ -1,79 +1,85 @@
 package view;
 
-import controller.FixedCycle;
-import controller.Simulation;
-import controller.Strategy;
+import controller.*;
+import javafx.animation.AnimationTimer;
 import javafx.application.Application;
 import javafx.scene.Scene;
+import javafx.scene.canvas.Canvas;
+import javafx.scene.control.*;
 import javafx.scene.layout.BorderPane;
 import javafx.stage.Stage;
-import model.Road;
-import model.TrafficLight;
-import model.Vehicle;
+import model.*;
 
 public class MainApp extends Application {
 
-    public static void main(String[] args) {
-        launch(args);
-    }
+    private long lastTime = 0;
 
     @Override
     public void start(Stage stage) {
 
-        Simulation simulation = new Simulation();
+        TrafficLight light;
+        Road road;
+        Sensor sensor;
 
-        Road eastToWest   = new Road("eastToWest",   600);
-        Road westToEast   = new Road("westToEast",   600);
-        Road northToSouth = new Road("northToSouth", 600);
-        Road southToNorth = new Road("southToNorth", 600);
+        light = new TrafficLight(null);
+        road = new Road(light);
+        sensor = new Sensor(road);
 
-        eastToWest.setStart(700, 300);
-        westToEast.setStart(100, 300);
-        northToSouth.setStart(400, 50);
-        southToNorth.setStart(400, 550);
+        light = new TrafficLight(new AdaptiveCycle(sensor));
 
-        simulation.addRoad(eastToWest);
-        simulation.addRoad(westToEast);
-        simulation.addRoad(northToSouth);
-        simulation.addRoad(southToNorth);
+        Simulation sim = new Simulation();
 
-        Strategy strategy = new FixedCycle();
+        Vehicle normal = new Vehicle(road, 60, false);
+        Vehicle emergency = new Vehicle(road, 80, true);
 
-        TrafficLight north = new TrafficLight("N", strategy);
-        TrafficLight south = new TrafficLight("S", strategy);
-        TrafficLight east  = new TrafficLight("E", strategy);
-        TrafficLight west  = new TrafficLight("W", strategy);
+        sim.addLight(light);
+        sim.addVehicle(normal);
+        sim.addVehicle(emergency);
 
-        simulation.addLight(north);
-        simulation.addLight(south);
-        simulation.addLight(east);
-        simulation.addLight(west);
+        Canvas canvas = new Canvas(600, 400);
+        CanvasView view = new CanvasView(canvas);
 
-        eastToWest.setTrafficLight(west);
-        westToEast.setTrafficLight(east);
-        northToSouth.setTrafficLight(north);
-        southToNorth.setTrafficLight(south);
+        Button start = new Button("Start");
+        Button stop = new Button("Stop");
+        Button reset = new Button("Reset");
 
-        Vehicle car1 = new Vehicle(eastToWest, 40);
-        Vehicle car2 = new Vehicle(westToEast, 30);
-        Vehicle car3 = new Vehicle(northToSouth, 25);
-        Vehicle car4 = new Vehicle(southToNorth, 35);
+        Slider speed = new Slider(0.2, 3, 1);
 
-        simulation.addVehicle(car1);
-        simulation.addVehicle(car2);
-        simulation.addVehicle(car3);
-        simulation.addVehicle(car4);
+        start.setOnAction(e -> sim.start());
+        stop.setOnAction(e -> sim.stop());
+        reset.setOnAction(e -> sim.reset());
 
-        CanvasView canvas = new CanvasView(simulation);
-        ControlPanel controls = new ControlPanel(canvas);
+        speed.valueProperty().addListener((obs, o, n) ->
+                sim.setSpeedMultiplier(n.doubleValue())
+        );
+
+        ToolBar bar = new ToolBar(start, stop, reset, new Label("Speed"), speed);
 
         BorderPane root = new BorderPane();
+        root.setTop(bar);
         root.setCenter(canvas);
-        root.setBottom(controls);
 
-        Scene scene = new Scene(root, 800, 600);
-        stage.setTitle("Smart Traffic Simulation - M3");
-        stage.setScene(scene);
+        stage.setScene(new Scene(root));
+        stage.setTitle("Smart Traffic Flow Simulation");
         stage.show();
+
+        new AnimationTimer() {
+            @Override
+            public void handle(long now) {
+                if (lastTime == 0) {
+                    lastTime = now;
+                    return;
+                }
+                double delta = (now - lastTime) / 1e9;
+                lastTime = now;
+
+                sim.update(delta);
+                view.render(sim);
+            }
+        }.start();
+    }
+
+    public static void main(String[] args) {
+        launch();
     }
 }
