@@ -2,18 +2,7 @@ package controller;
 
 public class FixedCycle implements Strategy {
 
-    @Override
-    public double getRedDuration() {
-        return 5;
-    }
-
-    @Override
-    public double getGreenDuration() {
-        return 5;
-    }
-
-    @Override
-    public double getYellowDuration() {
-        return 2;
-    }
+    public double getRedDuration() { return 3; }
+    public double getGreenDuration() { return 4; }
+    public double getYellowDuration() { return 1; }
 }
