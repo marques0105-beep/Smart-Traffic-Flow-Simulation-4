@@ -1,28 +1,23 @@
 package view;
 
-import javafx.event.ActionEvent;
+import controller.Simulation;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.Slider;
-import javafx.scene.layout.HBox;
-import javafx.geometry.Insets;
+import javafx.scene.control.ToolBar;
 
-public class ControlPanel extends HBox {
+public class ControlPanel extends ToolBar {
 
-    public ControlPanel(CanvasView canvas) {
-        setSpacing(15);
-        setPadding(new Insets(10));
+    public ControlPanel(Simulation simulation) {
 
-        // Botões
         Button startBtn = new Button("Start");
         Button stopBtn = new Button("Stop");
-        Button restartBtn = new Button("Restart");
+        Button restartBtn = new Button("Reset");
 
-        startBtn.setOnAction((ActionEvent e) -> canvas.startSimulation());
-        stopBtn.setOnAction((ActionEvent e) -> canvas.stopSimulation());
-        restartBtn.setOnAction((ActionEvent e) -> canvas.restartSimulation());
+        startBtn.setOnAction(e -> simulation.start());
+        stopBtn.setOnAction(e -> simulation.stop());
+        restartBtn.setOnAction(e -> simulation.reset());
 
-        // Slider de velocidade
         Label speedLabel = new Label("Velocidade:");
 
         Slider speedSlider = new Slider(0.1, 3.0, 1.0);
@@ -32,10 +27,10 @@ public class ControlPanel extends HBox {
         speedSlider.setMinorTickCount(4);
 
         speedSlider.valueProperty().addListener((obs, oldVal, newVal) -> {
-            canvas.setSpeedFactor(newVal.doubleValue());
+            simulation.setSpeedMultiplier(newVal.doubleValue());
         });
 
-        getChildren().addAll(startBtn, stopBtn, restartBtn, speedLabel, speedSlider);
+        getItems().addAll(startBtn, stopBtn, restartBtn, speedLabel, speedSlider);
     }
 }
 
