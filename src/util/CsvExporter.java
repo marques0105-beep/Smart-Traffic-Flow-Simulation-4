@@ -1,11 +1,17 @@
 package util;
 
-import java.util.List;
+import java.io.FileWriter;
+import java.io.IOException;
 
 public class CsvExporter {
 
-    public static void export(String filename, List<String> lines) {
-        // TODO: implementar se for necessário para o relatório
-        // Aqui podes usar FileWriter/PrintWriter para escrever as linhas
+    public static void export(String file, Metrics metrics) {
+        try (FileWriter writer = new FileWriter(file)) {
+            writer.write("servedCars,averageWaitingTime\n");
+            writer.write(metrics.getServedCars() + "," +
+                    metrics.getAverageWaitingTime());
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 }
