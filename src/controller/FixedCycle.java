@@ -1,8 +1,13 @@
 package controller;
 
+import model.state.*;
+
 public class FixedCycle implements Strategy {
 
-    public double getRedDuration() { return 3; }
-    public double getGreenDuration() { return 4; }
-    public double getYellowDuration() { return 1; }
+    @Override
+    public double getDurationFor(LightState state) {
+        if (state instanceof GreenState) return 5;
+        if (state instanceof YellowState) return 2;
+        return 5; // Red
+    }
 }
