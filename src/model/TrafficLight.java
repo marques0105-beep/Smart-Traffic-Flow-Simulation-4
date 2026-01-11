@@ -1,40 +1,55 @@
 package model;
 
-import controller.Strategy;
 import model.state.LightState;
 import model.state.RedState;
+import controller.Strategy;
 
 public class TrafficLight {
 
     private LightState state;
+    private double timer;
     private Strategy strategy;
+    private boolean greenFinished = false;
+
 
     public TrafficLight(Strategy strategy) {
         this.strategy = strategy;
         this.state = new RedState();
+        this.timer = strategy.getRedDuration();
     }
 
-    public void update(double deltaTime) {
-        state.update(this, deltaTime);
+    public void update(double dt) {
+        timer -= dt;
+        state.update(this, dt);
     }
 
-    public void setState(LightState state) {
-        this.state = state;
+    public void changeState(LightState newState) {
+        state = newState;
+        timer = strategy.getDurationFor(state);
     }
 
-    public Strategy getStrategy() {
-        return strategy;
+    public boolean isGreen() {
+        return state.canPass();
     }
 
-    public boolean isRed() {
-        return state.getColor().equals("RED");
+    public void markGreenFinished() {
+        greenFinished = true;
     }
 
-    public String getColor() {
-        return state.getColor();
+    public boolean wasGreenBefore() {
+        boolean temp = greenFinished;
+        greenFinished = false;
+        return temp;
     }
 
-    public void reset() {
-        state = new RedState();
+
+    public boolean timerExpired() {
+        return timer <= 0;
+    }
+
+    public String getStateName() {
+        return state.getName();
     }
 }
+
+
