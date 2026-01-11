@@ -1,36 +1,38 @@
 package view;
 
-import controller.Simulation;
+import javafx.geometry.Insets;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.Slider;
-import javafx.scene.control.ToolBar;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.VBox;
 
-public class ControlPanel extends ToolBar {
+public class ControlPanel extends VBox {
 
-    public ControlPanel(Simulation simulation) {
+    private Button startBtn;
+    private Button stopBtn;
+    private Button resetBtn;
+    private Slider speedSlider;
 
-        Button startBtn = new Button("Start");
-        Button stopBtn = new Button("Stop");
-        Button restartBtn = new Button("Reset");
+    public ControlPanel(Runnable onStart, Runnable onStop, Runnable onReset, Slider slider) {
 
-        startBtn.setOnAction(e -> simulation.start());
-        stopBtn.setOnAction(e -> simulation.stop());
-        restartBtn.setOnAction(e -> simulation.reset());
+        setSpacing(10);
+        setPadding(new Insets(10));
 
-        Label speedLabel = new Label("Velocidade:");
+        startBtn = new Button("Start");
+        stopBtn = new Button("Stop");
+        resetBtn = new Button("Reset");
 
-        Slider speedSlider = new Slider(0.1, 3.0, 1.0);
-        speedSlider.setShowTickLabels(true);
-        speedSlider.setShowTickMarks(true);
-        speedSlider.setMajorTickUnit(0.5);
-        speedSlider.setMinorTickCount(4);
+        startBtn.setOnAction(e -> onStart.run());
+        stopBtn.setOnAction(e -> onStop.run());
+        resetBtn.setOnAction(e -> onReset.run());
 
-        speedSlider.valueProperty().addListener((obs, oldVal, newVal) -> {
-            simulation.setSpeedMultiplier(newVal.doubleValue());
-        });
+        speedSlider = slider; // Slider passado do MainApp
 
-        getItems().addAll(startBtn, stopBtn, restartBtn, speedLabel, speedSlider);
+        Label speedLabel = new Label("Simulation speed");
+
+        HBox buttons = new HBox(10, startBtn, stopBtn, resetBtn);
+        getChildren().addAll(buttons, speedLabel, speedSlider);
     }
 }
 
