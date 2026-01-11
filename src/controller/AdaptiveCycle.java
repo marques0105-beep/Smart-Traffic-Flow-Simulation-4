@@ -1,25 +1,21 @@
 package controller;
 
-import model.Sensor;
+import model.state.*;
 
 public class AdaptiveCycle implements Strategy {
 
-    private Sensor sensor;
+    private int waitingCars = 0;
 
-    public AdaptiveCycle(Sensor sensor) {
-        this.sensor = sensor;
+    public void setWaitingCars(int count) {
+        this.waitingCars = count;
     }
 
-    public double getRedDuration() {
-        return sensor.hasEmergency() ? 1 : 3;
-    }
-
-    public double getGreenDuration() {
-        if (sensor.hasEmergency()) return 8;
-        return 3 + sensor.getWaitingCars() * 0.5;
-    }
-
-    public double getYellowDuration() {
-        return 1;
+    @Override
+    public double getDurationFor(LightState state) {
+        if (state instanceof GreenState) {
+            return waitingCars > 2 ? 8 : 4;
+        }
+        if (state instanceof YellowState) return 2;
+        return 5;
     }
 }
