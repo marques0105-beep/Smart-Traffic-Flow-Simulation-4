@@ -1,35 +1,32 @@
 package model;
 
-import java.util.LinkedList;
-import java.util.Queue;
+import java.util.ArrayList;
+import java.util.List;
 
 public class Road {
 
-    private Queue<Vehicle> queue = new LinkedList<>();
-    private TrafficLight trafficLight;
+    private double length;
+    private List<Vehicle> vehicles = new ArrayList<>();
 
-    public Road(TrafficLight trafficLight) {
-        this.trafficLight = trafficLight;
+    public Road(double length) {
+        this.length = length;
     }
 
     public void addVehicle(Vehicle v) {
-        queue.add(v);
+        vehicles.add(v);
     }
 
-    public int getQueueSize() {
-        return queue.size();
+    public void update(double dt) {
+        for (Vehicle v : vehicles) {
+            v.update(dt);
+        }
     }
 
-    public boolean hasEmergencyVehicle() {
-        return queue.stream().anyMatch(Vehicle::isEmergency);
+    public List<Vehicle> getVehicles() {
+        return vehicles;
     }
 
-    public boolean hasRedLight() {
-        return trafficLight.isRed();
-    }
-
-    public TrafficLight getTrafficLight() {
-        return trafficLight;
+    public double getLength() {
+        return length;
     }
 }
-
