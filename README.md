@@ -1,2 +1,6 @@
-# Smart-Traffic-Flow-Simulation-4
-Projeto para a universidade SOCORROOOOO
+Smart Traffic Simulation
+Projeto para a disciplina de POO.
+
+Grupo:
+Gonçalo Marques: 30012478
+
