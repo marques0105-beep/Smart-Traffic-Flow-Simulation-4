@@ -8,46 +8,87 @@ import java.util.List;
 
 public class Simulation {
 
-    private List<Vehicle> vehicles = new ArrayList<>();
-    private List<TrafficLight> lights = new ArrayList<>();
-    private Metrics metrics = new Metrics();
+    private Road road;
+    private List<Intersection> intersections;
+    private AdaptiveCycle adaptiveStrategy;
+    private Metrics metrics;
 
-    private boolean running = false;
-    private double speedMultiplier = 1.0;
+    public Simulation() {
 
-    public void tick(double deltaTime) {
-        double adjusted = deltaTime * speedMultiplier;
+        road = new Road(800);
+        intersections = new ArrayList<>();
+        adaptiveStrategy = new AdaptiveCycle();
+        metrics = new Metrics();
 
-        for (TrafficLight l : lights)
-            l.update(adjusted);
+        // duas interseções em posições diferentes
+        intersections.add(new Intersection(
+                new TrafficLight(adaptiveStrategy), 300
+        ));
+        intersections.add(new Intersection(
+                new TrafficLight(adaptiveStrategy), 600
+        ));
 
-        for (Vehicle v : vehicles)
-            v.update(adjusted, metrics);
+        road.addVehicle(new Vehicle(50));
     }
 
-    public void update(double deltaTime) {
-        if (running) tick(deltaTime);
+    public void update(double dt) {
+
+        // SENSOR: contar carros parados antes de cada interseção
+        adaptiveStrategy.setWaitingCars(countWaitingCars());
+
+        // atualizar semáforos
+        for (Intersection i : intersections) {
+            i.update(dt);
+        }
+
+        // lógica dos veículos
+        for (Vehicle v : road.getVehicles()) {
+
+            boolean mustStop = false;
+
+            for (Intersection i : intersections) {
+                boolean nearIntersection =
+                        v.getPosition() >= i.getPosition() - 40 &&
+                                v.getPosition() <= i.getPosition();
+
+                if (!i.getTrafficLight().isGreen() && nearIntersection) {
+                    mustStop = true;
+                }
+            }
+
+            if (mustStop) v.stop();
+            else v.go();
+        }
+
+        road.update(dt);
     }
 
-    public void start() { running = true; }
-    public void stop() { running = false; }
-
-    public void reset() {
-        vehicles.forEach(Vehicle::reset);
-        lights.forEach(TrafficLight::reset);
-        metrics.reset();
+    public int countWaitingCars() {
+        int count = 0;
+        for (Vehicle v : road.getVehicles()) {
+            for (Intersection i : intersections) {
+                if (v.getPosition() >= i.getPosition() - 40 &&
+                        v.getPosition() <= i.getPosition()) {
+                    count++;
+                }
+            }
+        }
+        return count;
     }
 
-    public void setSpeedMultiplier(double speed) {
-        this.speedMultiplier = speed;
+    // ===== GETTERS =====
+    public Road getRoad() {
+        return road;
     }
 
-    public void addVehicle(Vehicle v) { vehicles.add(v); }
-    public void addLight(TrafficLight l) { lights.add(l); }
+    public List<Intersection> getIntersections() {
+        return intersections;
+    }
 
-    public List<Vehicle> getVehicles() { return vehicles; }
-    public List<TrafficLight> getLights() { return lights; }
-    public Metrics getMetrics() { return metrics; }
+    public Metrics getMetrics() {
+        return metrics;
+    }
 }
+
 
 
