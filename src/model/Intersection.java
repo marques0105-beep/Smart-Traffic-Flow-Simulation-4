@@ -1,17 +1,24 @@
 package model;
 
-import java.util.ArrayList;
-import java.util.List;
-
 public class Intersection {
 
-    private List<Road> roads = new ArrayList<>();
+    private TrafficLight trafficLight;
+    private double position; // posição na estrada
 
-    public void addRoad(Road road) {
-        roads.add(road);
+    public Intersection(TrafficLight light, double position) {
+        this.trafficLight = light;
+        this.position = position;
     }
 
-    public List<Road> getRoads() {
-        return roads;
+    public void update(double dt) {
+        trafficLight.update(dt);
+    }
+
+    public TrafficLight getTrafficLight() {
+        return trafficLight;
+    }
+
+    public double getPosition() {
+        return position;
     }
 }
