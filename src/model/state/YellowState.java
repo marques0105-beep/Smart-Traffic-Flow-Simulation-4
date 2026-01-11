@@ -4,20 +4,26 @@ import model.TrafficLight;
 
 public class YellowState implements LightState {
 
-    private double timer = 0;
-
     @Override
-    public void update(TrafficLight light, double deltaTime) {
-        timer += deltaTime;
-        if (timer >= light.getStrategy().getYellowDuration()) {
-            light.setState(new RedState());
+    public void update(TrafficLight light, double dt) {
+        if (light.timerExpired()) {
+
+            if (light.wasGreenBefore()) {
+                light.changeState(new RedState());
+            } else {
+                light.changeState(new GreenState());
+            }
         }
     }
 
+
     @Override
-    public String getColor() {
+    public boolean canPass() {
+        return false;
+    }
+
+    @Override
+    public String getName() {
         return "YELLOW";
     }
 }
-
-
